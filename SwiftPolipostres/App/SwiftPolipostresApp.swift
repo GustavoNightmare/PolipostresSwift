@@ -14,6 +14,7 @@ struct SwiftPolipostresApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+            MainTabView()
             // Antes de mostrar, creamos usuario de prueba para desarrollo
                        let vm = LoginViewModel(userRepository: userRepo)
                        LoginView(viewModel: vm)
