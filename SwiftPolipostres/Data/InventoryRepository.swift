@@ -12,16 +12,14 @@ protocol InventoryRepository {
     func saveAll(_ items: [Postre]) throws
 }
 
-final class UserDefaultsInventoryRepository: InventoryRepository {
-    private let key = "inventory_items"
+final class FileInventoryRepository: InventoryRepository {
+    private let file = "inventory.json"
 
     func getAll() -> [Postre] {
-        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
-        return (try? JSONDecoder().decode([Postre].self, from: data)) ?? []
+        LocalFileStore.read(file) ?? []
     }
 
     func saveAll(_ items: [Postre]) throws {
-        let data = try JSONEncoder().encode(items)
-        UserDefaults.standard.set(data, forKey: key)
+        try LocalFileStore.write(items, to: file)
     }
 }

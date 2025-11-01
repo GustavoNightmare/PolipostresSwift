@@ -29,4 +29,3 @@ enum LocalFileStore {
         try data.write(to: url, options: .atomic)
     }
 }
-
