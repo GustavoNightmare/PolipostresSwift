@@ -1,15 +1,9 @@
-//
-//  PostreRowView.swift
-//  SwiftPolipostres
-//
-//  Created by Telematica on 1/11/25.
-//
 import SwiftUI
 
 struct PostreRowView: View {
     let item: Postre
-    let onAdd: () -> Void
-    let onSell: () -> Void
+    var onAdd: (() -> Void)? = nil     // 🔁 ahora opcional
+    var onSell: (() -> Void)? = nil    // 🔁 ahora opcional
 
     var body: some View {
         HStack(spacing: 12) {
@@ -18,27 +12,36 @@ struct PostreRowView: View {
                 Text("Stock: \(item.stock)").font(.subheadline).foregroundColor(AppColors.hint)
             }
             Spacer()
-            Button(action: onAdd) {
-                ZStack {
-                    Circle().stroke(AppColors.hint, lineWidth: 1.4).frame(width: 36, height: 36)
-                    Image(systemName: "plus").foregroundColor(AppColors.text)
+
+            // Solo aparece si nos pasan onAdd
+            if let onAdd {
+                Button(action: onAdd) {
+                    ZStack {
+                        Circle().stroke(AppColors.hint, lineWidth: 1.4).frame(width: 36, height: 36)
+                        Image(systemName: "plus").foregroundColor(AppColors.text)
+                    }
                 }
             }
-            Button(action: onSell) {
-                HStack(spacing: 8) {
-                    Image(systemName: "cart.fill")
-                    Text("Vender 1").bold()
+
+            // Solo aparece si nos pasan onSell
+            if let onSell {
+                Button(action: onSell) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "cart.fill")
+                        Text("Vender 1").bold()
+                    }
+                    .padding(.horizontal, 14)
+                    .frame(height: 36)
+                    .background(AppColors.pink)
+                    .foregroundColor(.black)
+                    .clipShape(Capsule())
                 }
-                .padding(.horizontal, 14)
-                .frame(height: 36)
-                .background(AppColors.pink)
-                .foregroundColor(.black)
-                .clipShape(Capsule())
+                .disabled(item.stock == 0)
+                .opacity(item.stock == 0 ? 0.5 : 1)
             }
-            .disabled(item.stock == 0)
-            .opacity(item.stock == 0 ? 0.5 : 1)
         }
         .padding(16)
         .background(RoundedRectangle(cornerRadius: 16).fill(AppColors.surface))
     }
 }
+

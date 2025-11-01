@@ -1,10 +1,3 @@
-//
-//  RegisterViewModel.swift
-//  SwiftPolipostres
-//
-//  Created by Telematica on 1/11/25.
-//
-
 import Foundation
 
 final class RegisterViewModel: ObservableObject {
@@ -65,3 +58,4 @@ final class RegisterViewModel: ObservableObject {
         return true
     }
 }
+

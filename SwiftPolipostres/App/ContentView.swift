@@ -11,12 +11,16 @@ struct ContentView: View {
 
     var body: some View {
         Group {
+            if auth.currentUser == nil {
+                NavigationStack { LoginView() }
+            } else {
                 MainTabView()
             }
         }
     }
-
+}
 
 #Preview {
     ContentView().environmentObject(AuthViewModel())
 }
+

@@ -29,3 +29,21 @@ enum LocalFileStore {
         try data.write(to: url, options: .atomic)
     }
 }
+extension LocalFileStore {
+    static func writeData(_ data: Data, to filename: String) throws {
+        let url = documentsURL.appendingPathComponent(filename)
+        try data.write(to: url, options: .atomic)
+    }
+
+    static func readData(_ filename: String) -> Data? {
+        let url = documentsURL.appendingPathComponent(filename)
+        return try? Data(contentsOf: url)
+    }
+}
+extension LocalFileStore {
+    static func deleteFile(_ filename: String) {
+        let url = documentsURL.appendingPathComponent(filename)
+        try? FileManager.default.removeItem(at: url)
+    }
+}
+

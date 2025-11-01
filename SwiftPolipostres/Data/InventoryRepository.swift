@@ -7,6 +7,10 @@
 
 import Foundation
 
+extension Notification.Name {
+    static let inventoryDidChange = Notification.Name("inventoryDidChange")
+}
+
 protocol InventoryRepository {
     func getAll() -> [Postre]
     func saveAll(_ items: [Postre]) throws
@@ -21,5 +25,7 @@ final class FileInventoryRepository: InventoryRepository {
 
     func saveAll(_ items: [Postre]) throws {
         try LocalFileStore.write(items, to: file)
+        NotificationCenter.default.post(name: .inventoryDidChange, object: nil) // 👈 avisa cambios
     }
 }
+

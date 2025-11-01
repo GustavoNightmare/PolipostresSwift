@@ -1,10 +1,3 @@
-//
-//  SellViewModel.swift
-//  SwiftPolipostres
-//
-//  Created by Telematica on 1/11/25.
-//
-
 import Foundation
 import SwiftUI
 
@@ -13,25 +6,28 @@ final class SellViewModel: ObservableObject {
     @Published var toastMessage: String?
 
     private let repo: InventoryRepository
+    private var inventoryObserver: NSObjectProtocol?
 
     init(repo: InventoryRepository = FileInventoryRepository()) {
         self.repo = repo
         load()
+        // 🔄 si inventario cambia (vía eliminar o agregar stock), recargo
+        inventoryObserver = NotificationCenter.default.addObserver(
+            forName: .inventoryDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.load()
+        }
     }
 
-    func load() {
-        items = repo.getAll()
+    deinit {
+        if let ob = inventoryObserver { NotificationCenter.default.removeObserver(ob) }
     }
 
-    private func persist() {
-        try? repo.saveAll(items)
-    }
+    func load() { items = repo.getAll() }
 
-    func addOne(_ item: Postre) {
-        guard let idx = items.firstIndex(of: item) else { return }
-        items[idx].stock += 1
-        persist()
-    }
+    private func persist() { try? repo.saveAll(items) } // emite notificación
 
     func sellOne(_ item: Postre) {
         guard let idx = items.firstIndex(of: item) else { return }

@@ -1,12 +1,7 @@
-//
-//  SellView.swift
-//  SwiftPolipostres
-//
-//  Created by Telematica on 1/11/25.
-//
 import SwiftUI
 
 struct SellView: View {
+    @EnvironmentObject var auth: AuthViewModel          // 👈
     @StateObject private var vm = SellViewModel()
 
     var body: some View {
@@ -26,7 +21,7 @@ struct SellView: View {
                         .padding(.bottom, 6)
 
                     ForEach(vm.items) { item in
-                        PostreRowView(item: item, onAdd: { vm.addOne(item) }, onSell: { vm.sellOne(item) })
+                        PostreRowView(item: item, onSell: { vm.sellOne(item) })
                     }
 
                     Spacer(minLength: 24)
@@ -41,8 +36,28 @@ struct SellView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .toolbar {
+            // Cerrar sesión (izquierda)
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    auth.signOut()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Salir")
+                    }
+                    .foregroundColor(AppColors.text)
+                }
+            }
+            // Créditos (derecha)
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(destination: CreditsView()) {
+                    Image(systemName: "info.circle").foregroundColor(AppColors.text)
+                }
+            }
+        }
         .onAppear { vm.load() }
     }
 }
 
-#Preview { NavigationStack { SellView() } }
+#Preview { NavigationStack { SellView().environmentObject(AuthViewModel()) } }

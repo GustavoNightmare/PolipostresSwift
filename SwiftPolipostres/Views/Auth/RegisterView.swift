@@ -106,7 +106,9 @@ struct RegisterView: View {
                     HStack {
                         Text("¿Ya tienes cuenta?")
                             .foregroundColor(AppColors.hint)
-                        
+                        NavigationLink("Inicia sesión") { LoginView() }
+                            .foregroundColor(AppColors.text)
+                            .underline()
                     }
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .center)

@@ -1,13 +1,7 @@
-//
-//  MetricsView.swift
-//  SwiftPolipostres
-//
-//  Created by Telematica on 1/11/25.
-//
-
 import SwiftUI
 
 struct MetricsView: View {
+    @EnvironmentObject var auth: AuthViewModel          // 👈
     private let repo: InventoryRepository = FileInventoryRepository()
     @State private var items: [Postre] = []
 
@@ -53,8 +47,31 @@ struct MetricsView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
+        .toolbar {
+            // Cerrar sesión (izquierda)
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    auth.signOut()
+                } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Salir")
+                    }
+                    .foregroundColor(AppColors.text)
+                }
+            }
+            // Créditos (derecha)
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink(destination: CreditsView()) {
+                    Image(systemName: "info.circle").foregroundColor(AppColors.text)
+                }
+            }
+        }
         .onAppear { items = repo.getAll() }
+        .onReceive(NotificationCenter.default.publisher(for: .inventoryDidChange)) { _ in
+            items = repo.getAll()
+        }
     }
 }
 
-#Preview { NavigationStack { MetricsView() } }
+#Preview { NavigationStack { MetricsView().environmentObject(AuthViewModel()) } }

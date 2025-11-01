@@ -13,6 +13,7 @@ struct Postre: Codable, Identifiable, Equatable {
     var stock: Int
     var sold: Int
     var createdAt: Date
+    var imageFilename: String?    // 👈 NUEVO (opcional)
 
     static func ==(lhs: Postre, rhs: Postre) -> Bool { lhs.id == rhs.id }
 }

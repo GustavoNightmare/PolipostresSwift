@@ -4,13 +4,14 @@
 //
 //  Created by Telematica on 1/11/25.
 //
-
 import SwiftUI
 
 struct MainTabView: View {
     var body: some View {
         TabView {
-          
+            NavigationStack { InventoryView() }
+                .tabItem { Image(systemName: "list.bullet"); Text("Inventario") }
+
             NavigationStack { SellView() }
                 .tabItem { Image(systemName: "list.bullet.rectangle"); Text("Vender") }
 
