@@ -9,9 +9,9 @@ import SwiftUI
 
 @main
 struct SwiftPolipostresApp: App {
+
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+      
     }
 }
