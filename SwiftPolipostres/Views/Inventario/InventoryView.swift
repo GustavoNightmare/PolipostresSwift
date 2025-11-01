@@ -5,91 +5,100 @@
 //  Created by Telematica on 1/11/25.
 //
 
+swift
 import SwiftUI
 
 struct InventoryView: View {
-    @StateObject private var viewModel = InventoryViewModel()
-    
+    @StateObject private var vm = InventoryViewModel()
+
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading, spacing: 20) {
-                
-                // --- Añadir postre ---
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Añadir postre")
+        ZStack(alignment: .bottom) {
+            AppColors.background.ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("PoliPostres")
                         .font(.headline)
-                        .foregroundColor(AppTheme.primary)
-                    
-                    TextField("Nombre del postre", text: $viewModel.nombrePostre)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .background(Color(.systemGray6))
-                    
-                    TextField("Stock inicial", text: $viewModel.stockInicial)
-                        .keyboardType(.numberPad)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .background(Color(.systemGray6))
-                    
-                    HStack {
-                        Button(action: viewModel.guardarPostre) {
-                            Label("Guardar", systemImage: "plus")
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(viewModel.nombrePostre.isEmpty || viewModel.stockInicial.isEmpty ? Color.gray : AppTheme.primary)
-                                .foregroundColor(.white)
-                                .cornerRadius(10)
-                        }
-                        .disabled(viewModel.nombrePostre.isEmpty || viewModel.stockInicial.isEmpty)
-                        
-                        Button(action: { viewModel.mostrarLista.toggle() }) {
-                            Label(viewModel.mostrarLista ? "Ocultar lista" : "Mostrar lista", systemImage: "eye")
-                                .padding()
-                        }
-                    }
-                }
-                .padding()
-                .background(AppTheme.cardBackground)
-                .cornerRadius(12)
-                
-                // --- Lista de postres ---
-                if viewModel.mostrarLista {
-                    Text("Postres guardados")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(viewModel.postres) { postre in
+                        .foregroundColor(AppColors.text)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 8)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Añadir postre")
+                            .foregroundColor(AppColors.text)
+                            .font(.headline)
+
+                        TextField("Nombre del postre", text: $vm.name)
+                            .autocorrectionDisabled(true)
+                            .fieldStyle()
+
+                        TextField("Stock inicial", text: $vm.stockText)
+                            .keyboardType(.numberPad)
+                            .fieldStyle()
+
+                        HStack {
+                            Button {
+                                vm.addItem()
+                            } label: {
+                                HStack { Image(systemName: "plus"); Text("Guardar").bold() }
+                                    .frame(maxWidth: 160, minHeight: 44)
+                                    .background(AppColors.pink.opacity(vm.name.isEmpty ? 0.5 : 1))
+                                    .foregroundColor(.black)
+                                    .clipShape(Capsule())
+                            }
+                            .disabled(vm.name.isEmpty)
+
+                            Spacer()
+
+                            Button {
+                                withAnimation { vm.hideList.toggle() }
+                            } label: {
                                 HStack {
-                                    VStack(alignment: .leading) {
-                                        Text(postre.nombre)
-                                            .font(.headline)
-                                        Text("Creado: \(viewModel.formatearFecha(postre.fechaCreacion))")
-                                            .font(.caption)
-                                            .foregroundColor(.gray)
-                                    }
-                                    Spacer()
-                                    Text("Stock: \(postre.stock)")
-                                        .font(.subheadline)
-                                        .foregroundColor(AppTheme.primary)
+                                    Image(systemName: vm.hideList ? "eye.slash" : "eye")
+                                    Text(vm.hideList ? "Mostrar lista" : "Ocultar lista")
                                 }
-                                .padding()
-                                .background(AppTheme.cardBackground)
-                                .cornerRadius(10)
+                                .foregroundColor(AppColors.text)
                             }
                         }
-                        .padding(.horizontal)
                     }
+                    .padding(16)
+                    .background(RoundedRectangle(cornerRadius: 16).fill(AppColors.surface))
+
+                    if !vm.hideList {
+                        Text("Postres guardados")
+                            .foregroundColor(AppColors.text)
+                            .font(.headline)
+                            .padding(.top, 6)
+
+                        ForEach(vm.items) { p in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(p.nombre).foregroundColor(AppColors.text).font(.headline)
+                                    Text("Creado: \(p.createdAt.formatted(date: .numeric, time: .shortened))")
+                                        .font(.footnote).foregroundColor(AppColors.hint)
+                                }
+                                Spacer()
+                                Text("Stock: \(p.stock)")
+                                    .foregroundColor(AppColors.text)
+                            }
+                            .padding(16)
+                            .background(RoundedRectangle(cornerRadius: 16).fill(AppColors.surface))
+                        }
+                    }
+
+                    Spacer(minLength: 24)
                 }
-                
-                Spacer()
+                .padding(.horizontal, 16)
             }
-            .padding(.top)
-            .navigationTitle("PoliPostres")
-            .background(AppTheme.background.ignoresSafeArea())
+
+            if let msg = vm.toastMessage {
+                ToastView(message: msg)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .padding(.bottom, 22)
+            }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
-#Preview {
-    InventoryView()
-}
+#Preview { NavigationStack { InventoryView() } }
+
